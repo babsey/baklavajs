@@ -1,5 +1,5 @@
 import { reactive, ref } from "vue";
-import { ICommand } from "./command";
+import { type ICommand } from "./command";
 import { useHotkeyHandler, HotkeyRegistrationOptions } from "./hotkeyHandler";
 
 export * from "./command";
@@ -23,6 +23,11 @@ export interface ICommandHandler {
      * @param command - Command definition
      */
     registerCommand<T extends AbstractCommand>(name: string, command: T): void;
+    /**
+     * Unregister an existing command
+     * @param name - Name of the command
+     */
+    unregisterCommand(name: string): void;
     /**
      * Executes the command with the given name
      * @param name - Name of the command
@@ -81,6 +86,12 @@ export const useCommandHandler: () => ICommandHandler = () => {
         commands.value.set(name, command);
     };
 
+    const unregisterCommand = (name: string): void => {
+        if (commands.value.has(name)) {
+            commands.value.delete(name);
+        }
+    };
+
     const executeCommand = <T extends AbstractCommand>(
         name: string,
         throwOnNonexisting = false,
@@ -113,5 +124,12 @@ export const useCommandHandler: () => ICommandHandler = () => {
 
     const hotkeyHandler = useHotkeyHandler(executeCommand);
 
-    return reactive({ hasCommand, registerCommand, executeCommand, canExecuteCommand, ...hotkeyHandler });
+    return reactive({
+        hasCommand,
+        registerCommand,
+        unregisterCommand,
+        executeCommand,
+        canExecuteCommand,
+        ...hotkeyHandler,
+    });
 };
