@@ -58,5 +58,17 @@ export function useHotkeyHandler(executeCommand: (name: string) => void) {
         handlers.value.push({ keys, commandName, options });
     };
 
-    return { pressedKeys, handleKeyDown, handleKeyUp, registerHotkey };
+    const unregisterHotkey = (keys: string[]) => {
+        const hotKeys: string[][] = handlers.value.map((handler: HotkeyHandler) => handler.keys);
+        const index = hotKeys.indexOf(keys);
+        if (index >= 0) {
+            handlers.value.splice(index, 1);
+        }
+    };
+
+    const clearHotkeys = () => {
+        handlers.value = [];
+    };
+
+    return { pressedKeys, handleKeyDown, handleKeyUp, registerHotkey, unregisterHotkey, clearHotkeys };
 }
